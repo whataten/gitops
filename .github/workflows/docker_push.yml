@@ -48,4 +48,4 @@ jobs:
       uses: docker/build-push-action@v5 
       with: 
         push: true 
-        tags: whataten/test:$(date +%Y-%m-%d_%H-%M-%S)
+        tags: whataten/test:${{ github.sha }}

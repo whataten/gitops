@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class GitopsApplication {
 
 	public static void main(String[] args) {
+		System.out.println("RUNNING");
 		SpringApplication.run(GitopsApplication.class, args);
 	}
-
 }

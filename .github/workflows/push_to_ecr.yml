@@ -23,7 +23,10 @@ jobs:
 
     - name: Set Commit Message as Image Tag
       id: get-commit-message
-      run: echo "IMAGE_TAG=$(git log -1 --pretty=%B | tr -d '[:space:]')" >> $GITHUB_ENV
+      run: |
+        COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+        IMAGE_TAG=$(echo "$COMMIT_MESSAGE" | awk -F ':' '{print $2}' | tr -d '[:space:]')
+        echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1

@@ -1,4 +1,4 @@
-FROM openjdk:17
+FROM docker.io/whataten/java:17
 
 WORKDIR /apiServer
 

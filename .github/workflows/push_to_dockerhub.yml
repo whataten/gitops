@@ -50,4 +50,4 @@ jobs:
       uses: docker/build-push-action@v5 
       with: 
         push: true 
-        tags: whataten/test:$IMAGE_TAG
+        tags: whataten/test:${{ github.sha }}

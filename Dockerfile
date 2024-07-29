@@ -1,8 +1,11 @@
-FROM ubuntu:20.04
+FROM openjdk:17
 
-EXPOSE 80
+WORKDIR /apiServer
 
-RUN \
-      apt-get update
+EXPOSE 8080
 
-CMD ["java", "-jar", "my.jar"]
+COPY backend/target/*.jar apiServer.jar
+
+RUN apt update
+
+ENTRYPOINT ["java", "-jar", "apiServer.jar"]

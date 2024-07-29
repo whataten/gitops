@@ -1,12 +1,8 @@
-name: Push To AWS ECR
+name: Push To Docker Hub
 
 on:
   push:
     branches: [ "main" ]
-
-env:
-  AWS_REGION: ap-northeast-2
-  ECR_REPOSITORY: poin-ecr
 
 permissions:
   contents: read
@@ -28,22 +24,31 @@ jobs:
         IMAGE_TAG=$(echo "$COMMIT_MESSAGE" | awk -F ':' '{print $2}' | tr -d '[:space:]')
         echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven    
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+    - name: Build with Maven
+      run: mvn -B clean package --file backend/pom.xml
 
-    - name: Build, tag, and push image to Amazon ECR
-      id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ env.IMAGE_TAG }}
-      run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+    - name: Login to Docker Hub 
+      uses: docker/login-action@v3 
+      with: 
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    steps:
+    - name: Set up QEMU 
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx 
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build and push 
+      uses: docker/build-push-action@v5 
+      with: 
+        push: true 
+        tags: whataten/test:$IMAGE_TAG
